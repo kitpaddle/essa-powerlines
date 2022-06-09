@@ -148,6 +148,7 @@ fetch('https://kitpaddle.github.io/hosting/M20-1-000-00-P3.json').then(response 
   // Do something for an error here
 });
 
+//////// GEOMAN - LEAFLET Controls for drawing/editing powerlines
 // add Leaflet-Geoman controls with some options to the map  
 map.pm.addControls({  
   position: 'topleft',
@@ -161,7 +162,6 @@ map.pm.addControls({
   cutPolygon: false,
   rotateMode: false
 });
-
 map.pm.enableDraw('Line',{ continueDrawing: false, snappable: false }); 
 map.pm.disableDraw();
 map.pm.setPathOptions({
@@ -170,6 +170,7 @@ map.pm.setPathOptions({
   fillOpacity: 1,
 });
 
+// Rewriting Geojson everytime a change is made to show tooltips
 map.on('pm:create', (e) => {
   let temp = map.pm.getGeomanDrawLayers(true);
   console.log('Added powerline');
@@ -188,7 +189,10 @@ let linesnr = 0;
 let nameLayer = new L.geoJSON(null,{pmIgnore: true});
 nameLayer.addTo(map);
 
+// Function to Drawnames on geojson with tooltip
+let exportJson;
 function drawNames(json){
+  exportJson = json;
   map.removeLayer(nameLayer);
   let a = json.features;
   for(let i=0;i<a.length;i++){
@@ -205,7 +209,18 @@ function onEachPower(feature, layer){
 }
 
 
-//// PRINTING
+//// FUNCTION TO CREATE .JSON GeoJson file with drawn powerlines
+
+function download(content, fileName, contentType) {
+    var a = document.createElement("a");
+    var file = new Blob([JSON.stringify(content, null, 2)], {type: contentType});
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+//// PRINTING Application and creating json file
 
 let form = document.getElementById('survey-form');
 form.addEventListener('submit', (event) => {
@@ -234,11 +249,15 @@ form.addEventListener('submit', (event) => {
   document.getElementById('printlines').innerHTML = linesnr.toString();
   if(form.elements['alt'].checked) document.getElementById('printalt').innerHTML = 'YES';
   else document.getElementById('printalt').innerHTML = 'NO';
-  /////////////////
+ 
+  // Waiting 0.5 sec after changing map to call reload and resize on map
   setTimeout(function(){
     map.invalidateSize();
     map.fitBounds(bounds);
   }, 500);
+  
+  // Waiting 2 secs after reload and resize before calling Print so it has a chance to Load
+  // Thereafter changing layout abck to normal
   setTimeout(function(){ 
     window.print();
     document.getElementById('infobar').style.display = 'block';
@@ -248,7 +267,8 @@ form.addEventListener('submit', (event) => {
     document.getElementById('printinfo').style.display = 'none';
   }, 2000);
   
-  //map.on("load", ()=>{window.print();});
-  //map.setView(startingPos, 10);
+  // Calls the function to create .json file with GeoJson data and set filename to date and callsign
+  let datenow = new Date().toISOString().substring(0, 10);
+  download(exportJson, datenow+'_'+form.elements['accall'].value+'.json', 'text/plain');
   
 });
