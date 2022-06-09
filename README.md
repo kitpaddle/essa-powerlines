@@ -17,3 +17,5 @@ The site was developed by Joachim Koitsalu. The code is open-source and makes us
 
 > Why do we ask bout the 335ft QNH altitude. If you cannot maintain at least 335ft QNH while doing the inspection, we cannot, according to the procedures set by state separate your aircraft from commercial aircarfts departing/landing at ESSA. Which means we either have to delay you or them while you do the inspection. And as you may understand commercial traffic flying in and out of Arlanda will have priority.
 
+A JSON file is also created each time an application is created. This JSON file is plain/text and contains all the drawn powerlines as GeoJson data.
+This can easily bew viewed in most geojson viewers, such as geojson.io. Upload the file and you can there see the drawn lines.
