@@ -214,7 +214,7 @@ function drawNames(json){
   map.removeLayer(nameLayer);
   let a = json.features;
   for(let i=0;i<a.length;i++){
-    a[i].properties.name = String.fromCharCode(65+(Math.floor(i/26)))+(i%10).toString();
+    a[i].properties.name = String.fromCharCode(65+(Math.floor(i/10)))+(i%10).toString();
   }
   nameLayer = new L.geoJSON(json, {pmIgnore: true, onEachFeature: onEachPower, style: {color: 'black', opacity: 0, weight: 0.1}});
   nameLayer.addTo(map);
